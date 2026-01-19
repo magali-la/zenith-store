@@ -9,7 +9,23 @@ const Product = require("../models/Product.js")
 // INDEX - get products data
 // get all products
 router.get("/products", async (req, res) => {
+    try {
+        // pass empty object to retrieve all products without filters
+        let products = await Product.find({}).exec();
 
+        if (products.length === 0) {
+            // if there are no products
+            res.status(404).json({message: "No products found." })
+        } else {
+            // send success code
+            res.status(200).json(products);
+        }
+    } catch (error) {
+        // console for backend
+        console.log("Error retrieving all products", error);
+        // set status and error message
+        res.status(500).json({ message: error.message });
+    }
 });
 
 // get product by id
