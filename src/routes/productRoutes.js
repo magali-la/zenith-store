@@ -47,8 +47,13 @@ router.get("/products", async (req, res) => {
                 sortFilter.price = -1;
             }
         }
+
+        // pagination - break up results into pages with limit (how many docs on one page) and skip methods (which index to start with) - default is page 1 and show 10 - set it to the query param, and if there isn't one, fallback to default values
+        const page = req.query.page || 1;
+        const pageSize = req.query.limit || 10;
+
         // pass filter object with potential query parameters added 
-        let products = await Product.find(filter).sort(sortFilter).exec();
+        let products = await Product.find(filter).sort(sortFilter).skip((page - 1) * pageSize).limit(pageSize).exec();
 
         if (products.length === 0) {
             // if there are no products
