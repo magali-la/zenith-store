@@ -97,6 +97,31 @@ router.get("/products/:id", async (req, res) => {
     };
 });
 
+// UPDATE - update an existing document by its id, return the modified document once it's done
+router.put("/products/:id", async (req, res) => {
+    const productId = req.params.id
+    try {
+        // takes 3 arguments, the id, the updated content in form of req.body, and the option to return the document after it's been updated
+        const updatedProduct = await Product.findByIdAndUpdate(productId, req.body, { new: true }).exec();
+
+        // check if the id is even correct
+        if (!updatedProduct){
+            console.log("Product not found with id: ", productId);
+            // not found error
+            res.status(404).json({ message: "No product found" })
+        } else {
+            console.log("Post updated: ", updatedProduct);
+            res.status(200).json(updatedProduct);
+        }
+
+    } catch (error) {
+        console.error("Error updating the document with id, ", productId);
+
+        // error status code network error
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // CREATE - post a new product, set route and callback to check bookleans used in schema
 router.post("/products", async (req, res) => {
     // create a book, req.body refers to whatever data is passed from the client/ui form
