@@ -34,8 +34,21 @@ router.get("/products", async (req, res) => {
                 filter.price = { $lte: req.query.maxPrice };
             }
         }
+
+        // sort - create a new sortFilter empty object for the sort method chained to product
+        const sortFilter = {}
+        if (req.query.sortBy) {
+            // conditional if value is price_asc
+            if (req.query.sortBy === "price_asc") {
+                // mongoose sort method takes the field and adds 1 for ascending
+                sortFilter.price = 1;
+            } else if (req.query.sortBy === "price_desc") {
+                // -1 for descending
+                sortFilter.price = -1;
+            }
+        }
         // pass filter object with potential query parameters added 
-        let products = await Product.find(filter).exec();
+        let products = await Product.find(filter).sort(sortFilter).exec();
 
         if (products.length === 0) {
             // if there are no products
