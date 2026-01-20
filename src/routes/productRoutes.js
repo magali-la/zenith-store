@@ -97,6 +97,28 @@ router.get("/products/:id", async (req, res) => {
     };
 });
 
+// DELETE - delete a product by its id
+router.delete("/products/:id", async (req, res) => {
+    const productId = req.params.id;
+
+    try {
+        const deletedProduct = await Product.findByIdAndDelete(productId);
+
+        // handle if the product hasn't been found by that id
+        if (!deletedProduct) {
+            console.log("Product not found.");
+            res.status(404).json({ message: "No product found." });
+        } else {
+            console.log("Product successfully deleted", deletedProduct);
+            // send the deleted post to the client, could be useful for undo functionality to store what was deleted
+            res.status(200).json({ message: "Product successfully deleted", product: deletedProduct });
+        }
+    } catch (error) {
+        console.error("Error deleting product, ", productId);
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // UPDATE - update an existing document by its id, return the modified document once it's done
 router.put("/products/:id", async (req, res) => {
     const productId = req.params.id
