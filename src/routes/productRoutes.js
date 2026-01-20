@@ -17,6 +17,23 @@ router.get("/products", async (req, res) => {
         if (req.query.category) {
             filter.category = req.query.category;
         }
+
+        // min & max price
+        if (req.query.minPrice) {
+            // use mongoose comparison operator for >= / set the key for the filter as price as this is what the field is for each product in the database, set it to an object
+            filter.price = { $gte: req.query.minPrice };
+        }
+
+        if (req.query.maxPrice) {
+            // do a conditional to not overwrite if a min price was included already under the price query
+            if (filter.price) {
+                // add $lte key to this price object in addition to whats already in if minprice was added as a quer
+                filter.price.$lte = req.query.maxPrice;
+            } else {
+                // otherwise just set the price object to <=
+                filter.price = { $lte: req.query.maxPrice };
+            }
+        }
         // pass filter object with potential query parameters added 
         let products = await Product.find(filter).exec();
 
