@@ -10,8 +10,15 @@ const Product = require("../models/Product.js")
 // get all products
 router.get("/products", async (req, res) => {
     try {
-        // pass empty object to retrieve all products without filters
-        let products = await Product.find({}).exec();
+        // set up filters for index - if they are undefined or not in the query params, they won't be included in the query
+        const filter = {};
+
+        // category - if it's in the request url, then set it in the object
+        if (req.query.category) {
+            filter.category = req.query.category;
+        }
+        // pass filter object with potential query parameters added 
+        let products = await Product.find(filter).exec();
 
         if (products.length === 0) {
             // if there are no products
